@@ -2,7 +2,6 @@
 
 import numpy as np
 import random
-
 from q1_softmax import softmax
 from q2_sigmoid import sigmoid, sigmoid_grad
 from q2_gradcheck import gradcheck_naive
@@ -37,14 +36,23 @@ def forward_backward_prop(X, labels, params, dimensions):
     W2 = np.reshape(params[ofs:ofs + H * Dy], (H, Dy))
     ofs += H * Dy
     b2 = np.reshape(params[ofs:ofs + Dy], (1, Dy))
-
     # Note: compute cost based on `sum` not `mean`.
     ### YOUR CODE HERE: forward propagation
-    raise NotImplementedError
+    z1 = np.dot(X, W1) + b1
+    a1 = sigmoid(z1)
+    z2 = np.dot(a1, W2) + b2
+    a2 = softmax(z2)
+    cost = np.sum(-(np.log(a2)*labels))/X.shape[0]
     ### END YOUR CODE
 
     ### YOUR CODE HERE: backward propagation
-    raise NotImplementedError
+    grad_z2 = (a2 - labels) /X.shape[0]
+    gradW2 = np.dot(a1.T, grad_z2)
+    gradb2 = np.sum(grad_z2, axis=0, keepdims=True)
+    grad_a1 = np.dot(grad_z2, W2.T)
+    grad_z1 = grad_a1 * sigmoid_grad(a1)
+    gradW1 = np.dot(X.T, grad_z1)
+    gradb1 = np.sum(grad_z1, axis=0,keepdims=True)
     ### END YOUR CODE
 
     ### Stack gradients (do not modify)
@@ -59,14 +67,14 @@ def sanity_check():
     Set up fake data and parameters for the neural network, and test using
     gradcheck.
     """
-    print "Running sanity check..."
+    print ("Running sanity check...")
 
     N = 20
     dimensions = [10, 5, 10]
     data = np.random.randn(N, dimensions[0])   # each row will be a datum
     labels = np.zeros((N, dimensions[2]))
-    for i in xrange(N):
-        labels[i, random.randint(0,dimensions[2]-1)] = 1
+    for i in range(N):
+        labels[i, random.randint(0, dimensions[2]-1)] = 1
 
     params = np.random.randn((dimensions[0] + 1) * dimensions[1] + (
         dimensions[1] + 1) * dimensions[2], )
@@ -74,7 +82,7 @@ def sanity_check():
     gradcheck_naive(lambda params:
         forward_backward_prop(data, labels, params, dimensions), params)
 
-
+'''
 def your_sanity_checks():
     """
     Use this space add any additional sanity checks by running:
@@ -86,8 +94,8 @@ def your_sanity_checks():
     ### YOUR CODE HERE
     raise NotImplementedError
     ### END YOUR CODE
-
+'''
 
 if __name__ == "__main__":
     sanity_check()
-    your_sanity_checks()
+    #your_sanity_checks()
