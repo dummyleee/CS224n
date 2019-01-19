@@ -22,16 +22,16 @@ def load_saved_params():
             st = iter
 
     if st > 0:
-        with open("saved_params_%d.npy" % st, "r") as f:
-            params = pickle.load(f)
-            state = pickle.load(f)
+        with open("saved_params_%d.npy" % st, "rb") as f:
+            params = pickle.load(f, encoding='iso-8859-1')
+            state = pickle.load(f, encoding='iso-8859-1')
         return st, params, state
     else:
         return st, None, None
 
 
 def save_params(iter, params):
-    with open("saved_params_%d.npy" % iter, "w") as f:
+    with open("saved_params_%d.npy" % iter, "wb+") as f:
         pickle.dump(params, f)
         pickle.dump(random.getstate(), f)
 
@@ -84,7 +84,9 @@ def sgd(f, x0, step, iterations, postprocessing=None, useSaved=False,
 
         cost = None
         ### YOUR CODE HERE
-
+        cost, grad = f(x)
+        x -= step * grad
+        postprocessing(x)
         ### END YOUR CODE
 
         if iter % PRINT_EVERY == 0:
@@ -92,7 +94,7 @@ def sgd(f, x0, step, iterations, postprocessing=None, useSaved=False,
                 expcost = cost
             else:
                 expcost = .95 * expcost + .05 * cost
-            print ("iter %d: %f" % (iter, expcost))
+            print("iter %d: %f" % (iter, expcost))
 
         if iter % SAVE_PARAMS_EVERY == 0 and useSaved:
             save_params(iter, x)

@@ -4,7 +4,7 @@ import random
 import numpy as np
 from utils.treebank import StanfordSentiment
 import matplotlib
-matplotlib.use('agg')
+#matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import time
 
@@ -48,13 +48,13 @@ wordVectors = np.concatenate(
     axis=0)
 # wordVectors = wordVectors[:nWords,:] + wordVectors[nWords:,:]
 
-visualizeWords = [
-    "the", "a", "an", ",", ".", "?", "!", "``", "''", "--",
+visualizeWords =["the", "a", "an", ",", ".", "?", "!", "``", "''", "--",
     "good", "great", "cool", "brilliant", "wonderful", "well", "amazing",
     "worth", "sweet", "enjoyable", "boring", "bad", "waste", "dumb",
     "annoying"]
 
-visualizeIdx = [tokens[word] for word in visualizeWords]
+
+visualizeIdx = [tokens[word.lower().encode("latin1")] for word in visualizeWords]
 visualizeVecs = wordVectors[visualizeIdx, :]
 temp = (visualizeVecs - np.mean(visualizeVecs, axis=0))
 covariance = 1.0 / len(visualizeIdx) * temp.T.dot(temp)
@@ -67,5 +67,5 @@ for i in range(len(visualizeWords)):
 
 plt.xlim((np.min(coord[:,0]), np.max(coord[:,0])))
 plt.ylim((np.min(coord[:,1]), np.max(coord[:,1])))
-
-plt.savefig('q3_word_vectors.png')
+plt.show()
+#plt.savefig('q3_word_vectors.png')
