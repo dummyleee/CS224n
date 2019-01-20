@@ -6,9 +6,8 @@ import numpy as np
 import os
 import random
 
-
 class StanfordSentiment:
-    def __init__(self, path=None, tablesize = 1000000):
+    def __init__(self, path=None, tablesize=1000000):
         if not path:
             path = "utils/datasets/stanfordSentimentTreebank"
 
@@ -19,8 +18,8 @@ class StanfordSentiment:
         if hasattr(self, "_tokens") and self._tokens:
             return self._tokens
 
-        tokens = dict()#词到词序的映射
-        tokenfreq = dict()#词频
+        tokens = dict()
+        tokenfreq = dict()
         wordcount = 0
         revtokens = []
         idx = 0
@@ -47,9 +46,8 @@ class StanfordSentiment:
         self._revtokens = revtokens
         return self._tokens
 
-    ##将语料库分词并转码返回词矩阵
     def sentences(self):
-        if hasattr(self, "_sentences") and self._sentences:#判断self对象是否有_sent对象，值得学习
+        if hasattr(self, "_sentences") and self._sentences:
             return self._sentences
 
         sentences = []
@@ -60,9 +58,9 @@ class StanfordSentiment:
                     first = False
                     continue
 
-                splitted = line.strip().split()[1:]
+                splitted = line.strip().split()[1:] #split 会把'\/'字符自动换成'\\/'字符
                 # Deal with some peculiar encoding issues with this file
-                sentences += [[w.lower().encode('latin1') for w in splitted]]
+                sentences += [[w.lower() for w in splitted]]
 
         self._sentences = sentences
         self._sentlengths = np.array([len(s) for s in sentences])
@@ -118,16 +116,15 @@ class StanfordSentiment:
 
         dictionary = dict()
         phrases = 0
-        with open(self.path + "/dictionary.txt", "r") as f:
+        with open(self.path + "/dictionary.txt", "r", encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if not line: continue
                 splitted = line.split("|")
                 dictionary[splitted[0].lower()] = int(splitted[1])
                 phrases += 1
-
         labels = [0.0] * phrases
-        with open(self.path + "/sentiment_labels.txt", "r") as f:
+        with open(self.path + "/sentiment_labels.txt", "r", encoding="utf-8") as f:
             first = True
             for line in f:
                 if first:
@@ -144,7 +141,8 @@ class StanfordSentiment:
         for i in range(self.numSentences()):
             sentence = sentences[i]
             full_sent = " ".join(sentence).replace('-lrb-', '(').replace('-rrb-', ')')
-            sent_labels[i] = labels[dictionary[full_sent]]
+            a = dictionary[full_sent]
+            sent_labels[i] = labels[a]
 
         self._sent_labels = sent_labels
         return self._sent_labels
@@ -154,7 +152,7 @@ class StanfordSentiment:
             return self._split
 
         split = [[] for i in range(3)]
-        with open(self.path + "/datasetSplit.txt", "r") as f:
+        with open(self.path + "/datasetSplit.txt", "r", encoding="utf-8") as f:
             first = True
             for line in f:
                 if first:
